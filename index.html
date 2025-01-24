@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Submission to CleverTap</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        button {
+            margin: 5px 0;
+        }
+        #ct-nativedisplay {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 100px;
+        }
+    </style>
+    <script type="text/javascript">
+        // Initialize CleverTap object
+        var clevertap = { event: [], profile: [], account: [], onUserLogin: [], notifications: [], privacy: [] };
+
+        // Replace with your CleverTap account ID and region
+        clevertap.account.push({ "id": "TEST-4R8-7ZK-6K7Z", "region": "eu1" });
+        clevertap.privacy.push({ optOut: false }); // User has not opted out of data sharing
+        clevertap.privacy.push({ useIP: false }); // Do not use IP for data
+
+        // Load CleverTap SDK
+        (function () {
+            var wzrk = document.createElement('script');
+            wzrk.type = 'text/javascript';
+            wzrk.async = true;
+            wzrk.src = 'https://d2r1yp2w7bby2u.cloudfront.net/js/clevertap.min.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(wzrk, s);
+        })();
+    </script>
+</head>
+<body>
+    <h1>User Registration</h1>
+    <form id="userForm">
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <label for="membership">Membership Type:</label><br>
+        <input type="text" id="membership" name="membership" required><br><br>
+
+        <button type="button" onclick="submitForm()">Submit</button>
+        <button type="button" onclick="enableNotifications()">Enable Notifications</button>
+        <button type="button" onclick="triggerPush()">Trigger Push</button>
+        <button type="button" onclick="triggerBox()">Trigger Box Popup</button>
+        <button type="button" onclick="triggerBanner()">Trigger Banner Popup</button>
+        <button type="button" onclick="triggerInterstitial()">Trigger Interstitial Popup</button>
+        <button type="button" onclick="webexit()">Trigger Web Exit Intent</button>
+        <button type="button" onclick="triggerWebNativeDisplay()">Show Native Display</button>
+    </form>
+
+    <p id="output"></p>
+
+    <!-- Div for CleverTap Native Display -->
+    <div id="ct-nativedisplay" style="border: 1px solid #ccc; padding: 10px; margin-top: 20px; width: 400px; height: 400px;">
+        <!-- CleverTap Native Display content will be rendered here -->
+    </div>
+
+    <script>
+        // Function to enable notifications
+        function enableNotifications() {
+            clevertap.notifications.push({
+                titleText: "Would you like to receive Push Notifications?",
+                bodyText: "We promise to only send you relevant updates and offers.",
+                okButtonText: "Allow",
+                rejectButtonText: "No, Thanks",
+                okButtonColor: "#F28046",
+            });
+            alert("Notification subscription dialog triggered!");
+        }
+
+        // Function to submit user data to CleverTap
+        function submitForm() {
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const membership = document.getElementById("membership").value;
+
+            if (!name || !email || !membership) {
+                alert("Please fill in all fields!");
+                return;
+            }
+
+            clevertap.onUserLogin.push({
+                "Site": {
+                    "Name": name,
+                    "Email": email,
+                }
+            });
+
+            clevertap.profile.push({
+                "Site": {
+                    "Customer Type": membership,
+                }
+            });
+
+            document.getElementById("output").innerText = "User details submitted to CleverTap!";
+            alert("User details successfully submitted to CleverTap!");
+        }
+
+        // Push_Notification_Triggered event
+        function triggerPush() {
+            // alert("Push Notification Triggered");
+            clevertap.event.push("Push Notification Triggered");
+        }
+
+
+
+        //Box Popup
+        function triggerBox() {
+            // alert("Box Popup button clicked");
+            clevertap.event.push("BoxPopup");
+        }
+
+
+
+        function triggerBanner() {
+            // alert("Banner Popup button clicked");
+            clevertap.event.push("Banner Popup");
+        }
+
+
+
+        function triggerInterstitial() {
+            // alert("Interstitial Popup button clicked");
+            clevertap.event.push("Interstitial Popup");
+        }
+
+
+
+        function webexit() {
+            // alert("Web Exit Intent clicked");
+            clevertap.event.push("Web Exit Intent");
+        }
+
+        // Function to trigger Web Native Display
+        function triggerWebNativeDisplay() {
+            // This simulates a "Product Viewed" event
+            clevertap.event.push("Web Event", {});
+
+            // Trigger CleverTap native display with the target div and event-based content
+            clevertap.notifications.push({
+                type: "wzrk_native_display", // Native display type
+                targetDivId: "ct-nativedisplay", // Target div for display
+            });
+
+          //  alert("Native Display triggered! Check the display container.");
+        }
+    </script>
+    <script type="text/javascript">
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker 
+            .register("./clevertap_sw.js") // path to the service worker file
+            .then(function (registration) {
+              console.log("Service Worker Registered");
+            })
+            .catch(function (error) {
+              console.error("Service Worker Registration failed:", error);
+            });
+        }
+    </script>
+  
+</body>
+</html>

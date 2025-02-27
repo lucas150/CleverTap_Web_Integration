@@ -64,6 +64,7 @@
         <button type="button" onclick="triggerInterstitial()">Trigger Interstitial Popup</button>
         <button type="button" onclick="webexit()">Trigger Web Exit Intent</button>
         <button type="button" onclick="triggerWebNativeDisplay()">Show Native Display</button>
+        <button type="button" onClick="logout()">Logout</button>
     </form>
 
     <p id="output"></p>
@@ -99,16 +100,20 @@
 
             clevertap.onUserLogin.push({
                 "Site": {
-                    "Name": name,
-                    "Email": email,
+                    "name": name,
+                     "email": email,
+                    "identity": Math.floor(Math.random() * 1000000) // Generates a random integer
+
                 }
             });
 
-            clevertap.profile.push({
-                "Site": {
-                    "Customer Type": membership,
-                }
-            });
+            // clevertap.profile.push({
+            //     "Site": {
+            //         "Customer Type": membership,
+            //         "Name": name,
+            //         "Identity": Math.floor(Math.random() * 1000000) // Generates a random integer
+            //     }
+            // });
 
             document.getElementById("output").innerText = "User details submitted to CleverTap!";
             alert("User details successfully submitted to CleverTap!");
@@ -133,6 +138,47 @@
         function triggerBanner() {
             // alert("Banner Popup button clicked");
             clevertap.event.push("Banner Popup");
+        }
+
+        function logout(){
+            // localStorage.clear(); // Deletes all local storage data
+            // console.log("All local storage data has been cleared.");
+            // localStorage.r   emoveItem("WZRK_PR"); // Removes only the "wzrk_pr" key
+            // console.log("wzrk_pr has been removed from local storage.");  
+             // List of keys to keep
+        const allowedKeys = [
+            "WZRK_L", 
+            "WZRK_G", 
+            "WZRK_ACCOUNT_ID", 
+            "WZRK_META",            
+            "source", 
+            "WZRK_ARP", 
+            "userlanguages"
+        ];
+
+        // Remove unwanted keys from Local Storage
+        Object.keys(localStorage).forEach(key => {
+            if (!allowedKeys.includes(key)) {
+                localStorage.removeItem(key);
+            }
+        });
+
+        // Remove unwanted keys from Session Storage
+        Object.keys(sessionStorage).forEach(key => {
+            if (!allowedKeys.includes(key)) {
+                sessionStorage.removeItem(key);
+            }
+        });
+
+        // Remove unwanted cookies
+        document.cookie.split(";").forEach(cookie => {
+            let key = cookie.split("=")[0].trim();
+            if (!allowedKeys.includes(key)) {
+                document.cookie = key + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            }
+        });
+
+        console.log("User logged out and unwanted keys removed.");
         }
 
 
